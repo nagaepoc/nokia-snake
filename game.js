@@ -9,15 +9,13 @@ class Game {
         this.gameRunning = false;
         
         this.speedSettings = {
-            slow: { base: 250, min: 100, increase: 0.97 },
-            medium: { base: 150, min: 50, increase: 0.95 },
-            fast: { base: 100, min: 30, increase: 0.93 }
+            slow: { base: 200 },    // 5 moves per second
+            medium: { base: 150 },   // ~6.7 moves per second
+            fast: { base: 100 }      // 10 moves per second
         };
         
         this.currentSpeedSetting = 'medium';
         this.baseSpeed = this.speedSettings[this.currentSpeedSetting].base;
-        this.minSpeed = this.speedSettings[this.currentSpeedSetting].min;
-        this.speedIncrease = this.speedSettings[this.currentSpeedSetting].increase;
         this.currentSpeed = this.baseSpeed;
         
         this.init();
@@ -91,12 +89,7 @@ class Game {
         if (this.speedSettings[speedSetting]) {
             this.currentSpeedSetting = speedSetting;
             this.baseSpeed = this.speedSettings[speedSetting].base;
-            this.minSpeed = this.speedSettings[speedSetting].min;
-            this.speedIncrease = this.speedSettings[speedSetting].increase;
-            
-            if (this.gameRunning && !this.gameOver) {
-                this.currentSpeed = this.baseSpeed;
-            }
+            this.currentSpeed = this.baseSpeed;
             
             localStorage.setItem('snakeSpeedSetting', speedSetting);
             
@@ -162,11 +155,6 @@ class Game {
         if (head.x === this.food.x && head.y === this.food.y) {
             this.score += 10;
             document.getElementById('score').textContent = this.score;
-            
-            this.currentSpeed = Math.max(
-                this.minSpeed,
-                this.currentSpeed * this.speedIncrease
-            );
             
             this.spawnFood();
             
