@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Nokia Snake PWA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 { color: #0a5c36; }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .pass { color: green; }
+        .fail { color: red; }
+        .warning { color: orange; }
+        button {
+            background: #0a5c36;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🐍 Nokia Snake PWA - Test Suite</h1>
+    
+    <div class="test-section">
+        <h2>File Structure Test</h2>
+        <div id="file-test">Checking files...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>JavaScript Test</h2>
+        <div id="js-test">Checking JavaScript...</div>
+        <button onclick="testGameObject()">Test Game Object</button>
+        <button onclick="testCanvas()">Test Canvas</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>PWA Test</h2>
+        <div id="pwa-test">Checking PWA features...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Quick Game Test</h2>
+        <p>Open <a href="index.html" target="_blank">index.html</a> in your browser to test the actual game.</p>
+        <button onclick="window.open('index.html', '_blank')">Open Game</button>
+    </div>
+    
+    <script>
+        function checkFile(file) {
+            return fetch(file)
+                .then(response => response.ok)
+                .catch(() => false);
+        }
+        
+        async function runFileTests() {
+            const files = [
+                'index.html',
+                'styles.css',
+                'game.js',
+                'input.js',
+                'renderer.js',
+                'ui.js',
+                'manifest.json',
+                'service-worker.js'
+            ];
+            
+            const results = [];
+            for (const file of files) {
+                const exists = await checkFile(file);
+                results.push({ file, exists });
+            }
+            
+            const fileTestDiv = document.getElementById('file-test');
+            fileTestDiv.innerHTML = '';
+            
+            results.forEach(result => {
+                const status = result.exists ? '✅' : '❌';
+                const color = result.exists ? 'pass' : 'fail';
+                fileTestDiv.innerHTML += `<div class="${color}">${status} ${result.file}</div>`;
+            });
+        }
+        
+        function testGameObject() {
+            const jsTestDiv = document.getElementById('js-test');
+            try {
+                if (typeof game !== 'undefined') {
+                    jsTestDiv.innerHTML = '<div class="pass">✅ Game object is available</div>';
+                    console.log('Game object:', game);
+                } else {
+                    jsTestDiv.innerHTML = '<div class="fail">❌ Game object not found</div>';
+                }
+            } catch (error) {
+                jsTestDiv.innerHTML = `<div class="fail">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        function testCanvas() {
+            const jsTestDiv = document.getElementById('js-test');
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    jsTestDiv.innerHTML += '<div class="pass">✅ Canvas API is available</div>';
+                } else {
+                    jsTestDiv.innerHTML += '<div class="fail">❌ Canvas API not available</div>';
+                }
+            } catch (error) {
+                jsTestDiv.innerHTML += `<div class="fail">❌ Canvas error: ${error.message}</div>`;
+            }
+        }
+        
+        function testPWA() {
+            const pwaTestDiv = document.getElementById('pwa-test');
+            pwaTestDiv.innerHTML = '';
+            
+            const tests = [
+                {
+                    name: 'Service Worker',
+                    test: () => 'serviceWorker' in navigator,
+                    message: 'Service Worker API available'
+                },
+                {
+                    name: 'Local Storage',
+                    test: () => 'localStorage' in window,
+                    message: 'Local Storage available'
+                },
+                {
+                    name: 'Manifest',
+                    test: async () => {
+                        try {
+                            const response = await fetch('manifest.json');
+                            return response.ok;
+                        } catch {
+                            return false;
+                        }
+                    },
+                    message: 'Manifest file exists'
+                }
+            ];
+            
+            tests.forEach(async (test) => {
+                const result = typeof test.test === 'function' ? await test.test() : test.test;
+                const status = result ? '✅' : '❌';
+                const color = result ? 'pass' : 'fail';
+                pwaTestDiv.innerHTML += `<div class="${color}">${status} ${test.name}: ${test.message}</div>`;
+            });
+        }
+        
+        window.onload = function() {
+            runFileTests();
+            testPWA();
+        };
+    </script>
+</body>
+</html>

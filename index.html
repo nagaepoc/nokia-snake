@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A classic Nokia-style Snake game PWA. Play offline anytime!">
+    <meta name="theme-color" content="#0a5c36">
+    <title>Nokia Snake PWA</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">🐍 Nokia Snake</h1>
+            <div class="score-container">
+                <div class="score">Score: <span id="score">0</span></div>
+                <div class="high-score">High: <span id="high-score">0</span></div>
+                <button id="reset-score-btn" class="btn-secondary" title="Reset high score">↺</button>
+            </div>
+        </header>
+
+        <main class="game-area">
+            <div class="game-wrapper">
+                <canvas id="game-canvas" width="400" height="400"></canvas>
+                <div class="overlay" id="start-overlay">
+                    <h2>Ready to Play?</h2>
+                    <p>Use arrow keys or on-screen buttons</p>
+                    <button id="start-btn" class="btn">Start Game</button>
+                </div>
+                <div class="overlay" id="game-over-overlay" style="display: none;">
+                    <h2>Game Over!</h2>
+                    <p>Score: <span id="final-score">0</span></p>
+                    <button id="restart-btn" class="btn">Play Again</button>
+                </div>
+            </div>
+
+            <div class="mobile-controls">
+                <div class="control-row">
+                    <button class="control-btn" id="up-btn" aria-label="Move up">↑</button>
+                </div>
+                <div class="control-row">
+                    <button class="control-btn" id="left-btn" aria-label="Move left">←</button>
+                    <div class="spacer"></div>
+                    <button class="control-btn" id="right-btn" aria-label="Move right">→</button>
+                </div>
+                <div class="control-row">
+                    <button class="control-btn" id="down-btn" aria-label="Move down">↓</button>
+                </div>
+            </div>
+        </main>
+
+        <div class="instructions">
+            <div class="instruction-section">
+                <h3>Desktop Controls</h3>
+                <p>Arrow Keys or WASD</p>
+            </div>
+            <div class="instruction-section">
+                <h3>Mobile Controls</h3>
+                <p>Use the buttons below</p>
+            </div>
+            <div class="instruction-section">
+                <h3>How to Play</h3>
+                <p>Eat food to grow. Avoid walls and yourself!</p>
+            </div>
+            <div class="instruction-section">
+                <h3>Speed Control</h3>
+                <div class="speed-controls">
+                    <button id="speed-slow" class="speed-btn">Slow</button>
+                    <button id="speed-medium" class="speed-btn active">Medium</button>
+                    <button id="speed-fast" class="speed-btn">Fast</button>
+                </div>
+                <p>Current: <span id="current-speed">Medium</span></p>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Built by Naga — nagarjunajava10@gmail.com</p>
+            <div class="pwa-info">
+                <button id="install-btn" class="btn-secondary" style="display: none;">Install App</button>
+                <span id="pwa-status"></span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="game.js"></script>
+    <script src="input.js"></script>
+    <script src="renderer.js"></script>
+    <script src="ui.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js');
+        }
+        
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-btn').style.display = 'block';
+        });
+        
+        document.getElementById('install-btn').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    document.getElementById('install-btn').style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
+    </script>
+</body>
+</html>

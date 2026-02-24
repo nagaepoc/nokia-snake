@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Generator - Nokia Snake PWA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #0a5c36;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #111;
+            border: 2px solid #0a5c36;
+            border-radius: 8px;
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #0a5c36;
+            text-shadow: 0 0 10px rgba(10, 92, 54, 0.5);
+        }
+        
+        .instructions {
+            background: rgba(10, 92, 54, 0.1);
+            border: 1px solid #0a5c36;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .instructions h2 {
+            color: #0a5c36;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .icon-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .icon-size {
+            text-align: center;
+        }
+        
+        .icon-canvas {
+            background: #000;
+            border: 2px solid #0a5c36;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            image-rendering: pixelated;
+        }
+        
+        .icon-label {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        
+        .download-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            background: #0a5c36;
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            background: #0c7d4a;
+            transform: translateY(-2px);
+        }
+        
+        .note {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid #ff4444;
+            border-radius: 6px;
+            color: #ff8888;
+        }
+        
+        .note strong {
+            color: #ff4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐍 Nokia Snake PWA Icon Generator</h1>
+        
+        <div class="instructions">
+            <h2>How to Generate Icons</h2>
+            <ol>
+                <li>Click "Generate All Icons" button below</li>
+                <li>Right-click each icon and select "Save image as..."</li>
+                <li>Save them in the <code>icons/</code> directory with the suggested filenames</li>
+                <li>Required sizes: 72x72, 96x96, 128x128, 144x144, 152x152, 192x192, 384x384, 512x512</li>
+            </ol>
+            <p><strong>Note:</strong> For production, you should create higher quality icons using graphic design software. These are placeholder icons.</p>
+        </div>
+        
+        <div class="icon-preview" id="icon-preview">
+            <!-- Icons will be generated here -->
+        </div>
+        
+        <div class="download-section">
+            <button class="btn" onclick="generateAllIcons()">Generate All Icons</button>
+            <button class="btn" onclick="downloadAllIcons()">Download All as ZIP</button>
+        </div>
+        
+        <div class="note">
+            <p><strong>Important:</strong> These are basic placeholder icons. For a production PWA, create professional icons using:</p>
+            <ul>
+                <li>Adobe Photoshop/Illustrator</li>
+                <li>Figma or Sketch</li>
+                <li>Online PWA icon generators</li>
+                <li>Make sure icons are square and have transparent backgrounds where needed</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        const iconSizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        
+        function drawSnakeIcon(ctx, size) {
+            const cellSize = Math.max(4, size / 10);
+            const gridSize = 8;
+            const offset = (size - (gridSize * cellSize)) / 2;
+            
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, size, size);
+            
+            ctx.fillStyle = '#0a5c36';
+            
+            const snake = [
+                {x: 4, y: 4},
+                {x: 3, y: 4},
+                {x: 2, y: 4},
+                {x: 2, y: 3},
+                {x: 2, y: 2},
+                {x: 3, y: 2},
+                {x: 4, y: 2},
+                {x: 5, y: 2}
+            ];
+            
+            snake.forEach(segment => {
+                const x = offset + segment.x * cellSize;
+                const y = offset + segment.y * cellSize;
+                ctx.fillRect(x, y, cellSize - 1, cellSize - 1);
+            });
+            
+            ctx.fillStyle = '#0c7d4a';
+            const head = snake[0];
+            const headX = offset + head.x * cellSize;
+            const headY = offset + head.y * cellSize;
+            ctx.fillRect(headX, headY, cellSize - 1, cellSize - 1);
+            
+            ctx.fillStyle = '#ff4444';
+            const foodX = offset + 6 * cellSize;
+            const foodY = offset + 4 * cellSize;
+            ctx.beginPath();
+            ctx.arc(foodX + cellSize/2, foodY + cellSize/2, cellSize/2 - 1, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(foodX + cellSize/3, foodY + cellSize/3, cellSize/6, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        function generateIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            canvas.className = 'icon-canvas';
+            
+            const ctx = canvas.getContext('2d');
+            drawSnakeIcon(ctx, size);
+            
+            const container = document.createElement('div');
+            container.className = 'icon-size';
+            
+            container.appendChild(canvas);
+            
+            const label = document.createElement('div');
+            label.className = 'icon-label';
+            label.textContent = `${size}x${size} - icon-${size}.png`;
+            container.appendChild(label);
+            
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'btn';
+            downloadBtn.textContent = 'Download';
+            downloadBtn.style.fontSize = '0.8rem';
+            downloadBtn.style.padding = '6px 12px';
+            downloadBtn.style.marginTop = '5px';
+            downloadBtn.onclick = () => downloadIcon(canvas, size);
+            container.appendChild(downloadBtn);
+            
+            return container;
+        }
+        
+        function generateAllIcons() {
+            const preview = document.getElementById('icon-preview');
+            preview.innerHTML = '';
+            
+            iconSizes.forEach(size => {
+                preview.appendChild(generateIcon(size));
+            });
+        }
+        
+        function downloadIcon(canvas, size) {
+            const link = document.createElement('a');
+            link.download = `icon-${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        function downloadAllIcons() {
+            alert('To download all icons:\n1. Generate all icons first\n2. Right-click each icon and "Save image as..."\n3. Save to the icons/ directory\n\nFor automatic ZIP download, you would need server-side code.');
+        }
+        
+        window.onload = generateAllIcons;
+    </script>
+</body>
+</html>
