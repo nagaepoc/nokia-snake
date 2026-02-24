@@ -8,12 +8,19 @@ class UI {
         this.installBtn = document.getElementById('install-btn');
         this.pwaStatus = document.getElementById('pwa-status');
         this.resetScoreBtn = document.getElementById('reset-score-btn');
+        this.menuBtn = document.getElementById('menu-btn');
+        this.menuOverlay = document.getElementById('menu-overlay');
+        this.closeMenuBtn = document.getElementById('close-menu-btn');
+        this.closeMenu = document.getElementById('close-menu');
+        this.installMenuBtn = document.getElementById('install-menu-btn');
+        this.menuCurrentSpeed = document.getElementById('menu-current-speed');
         
         this.init();
         this.updateHighScore();
         this.checkPWAStatus();
         this.initSpeedControls();
         this.initResetButton();
+        this.initMenu();
     }
     
     init() {
@@ -153,6 +160,100 @@ class UI {
         });
     }
     
+    initMenu() {
+        this.menuBtn.addEventListener('click', () => {
+            this.openMenu();
+        });
+        
+        this.menuBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            this.openMenu();
+        });
+        
+        this.closeMenuBtn.addEventListener('click', () => {
+            this.closeMenuOverlay();
+        });
+        
+        this.closeMenu.addEventListener('click', () => {
+            this.closeMenuOverlay();
+        });
+        
+        this.menuOverlay.addEventListener('click', (e) => {
+            if (e.target === this.menuOverlay) {
+                this.closeMenuOverlay();
+            }
+        });
+        
+        document.querySelectorAll('.menu-speed-controls .speed-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const speed = btn.dataset.speed;
+                game.setSpeed(speed);
+                this.updateSpeedButtons(speed);
+                this.updateMenuSpeedDisplay(speed);
+            });
+            
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const speed = btn.dataset.speed;
+                game.setSpeed(speed);
+                this.updateSpeedButtons(speed);
+                this.updateMenuSpeedDisplay(speed);
+            });
+        });
+        
+        if (this.installMenuBtn) {
+            this.installMenuBtn.addEventListener('click', () => {
+                if (window.deferredPrompt) {
+                    window.deferredPrompt.prompt();
+                }
+            });
+        }
+    }
+    
+    openMenu() {
+        if (game.gameRunning && !game.gameOver) {
+            game.pause();
+        }
+        
+        this.menuOverlay.style.display = 'flex';
+        this.updateMenuSpeedDisplay(game.currentSpeedSetting);
+        
+        if (window.deferredPrompt) {
+            this.installMenuBtn.style.display = 'block';
+        }
+    }
+    
+    closeMenuOverlay() {
+        this.menuOverlay.style.display = 'none';
+        
+        if (!game.gameOver && !game.gameRunning) {
+            setTimeout(() => {
+                if (!game.gameRunning && !game.gameOver) {
+                    game.showPauseOverlay();
+                }
+            }, 100);
+        }
+    }
+    
+    updateMenuSpeedDisplay(speedSetting) {
+        const speedLabels = {
+            slow: 'Slow',
+            medium: 'Medium',
+            fast: 'Fast'
+        };
+        
+        if (this.menuCurrentSpeed) {
+            this.menuCurrentSpeed.textContent = speedLabels[speedSetting];
+        }
+        
+        document.querySelectorAll('.menu-speed-controls .speed-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.speed === speedSetting) {
+                btn.classList.add('active');
+            }
+        });
+    }
+    
     showResetConfirmation() {
         const highScore = localStorage.getItem('snakeHighScore') || 0;
         if (highScore == 0) {
@@ -171,10 +272,8 @@ class UI {
             if (e.key === 'Escape') {
                 if (game.gameRunning && !game.gameOver) {
                     game.pause();
-                    this.showPauseScreen();
                 } else if (!game.gameRunning && !game.gameOver) {
                     game.resume();
-                    this.hidePauseScreen();
                 }
             }
         });
@@ -182,8 +281,40 @@ class UI {
         document.addEventListener('visibilitychange', () => {
             if (document.hidden && game.gameRunning && !game.gameOver) {
                 game.pause();
+            } else if (!document.hidden && !game.gameRunning && !game.gameOver) {
+                setTimeout(() => {
+                    if (!game.gameRunning && !game.gameOver) {
+                        game.showPauseOverlay();
+                    }
+                }, 100);
             }
         });
+        
+        window.addEventListener('blur', () => {
+            if (game.gameRunning && !game.gameOver) {
+                setTimeout(() => {
+                    if (document.hidden && game.gameRunning && !game.gameOver) {
+                        game.pause();
+                    }
+                }, 100);
+            }
+        });
+        
+        window.addEventListener('focus', () => {
+            if (!game.gameRunning && !game.gameOver) {
+                setTimeout(() => {
+                    if (!document.hidden && !game.gameRunning && !game.gameOver) {
+                        game.showPauseOverlay();
+                    }
+                }, 100);
+            }
+        });
+        
+        document.addEventListener('touchstart', () => {
+            if (!game.gameRunning && !game.gameOver && document.hidden === false) {
+                game.showPauseOverlay();
+            }
+        }, { once: true });
     }
     
     showPauseScreen() {

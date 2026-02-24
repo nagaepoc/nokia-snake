@@ -2,7 +2,7 @@
   "name": "Nokia Snake PWA",
   "short_name": "Snake",
   "description": "A classic Nokia-style Snake game. Play offline anytime!",
-  "start_url": "/nokia-snake/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#0a5c36",

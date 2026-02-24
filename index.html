@@ -6,7 +6,7 @@
     <meta name="description" content="A classic Nokia-style Snake game PWA. Play offline anytime!">
     <meta name="theme-color" content="#0a5c36">
     <title>Nokia Snake PWA</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/png" href="icons/icon-192.png">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
     <link rel="stylesheet" href="styles.css">
@@ -14,7 +14,11 @@
 <body>
     <div class="container">
         <header class="header">
-            <h1 class="title">🐍 Nokia Snake</h1>
+            <div class="header-top">
+                <button id="menu-btn" class="menu-btn" aria-label="Open menu">☰</button>
+                <h1 class="title">🐍 Nokia Snake</h1>
+                <div class="header-spacer"></div>
+            </div>
             <div class="score-container">
                 <div class="score">Score: <span id="score">0</span></div>
                 <div class="high-score">High: <span id="high-score">0</span></div>
@@ -34,6 +38,51 @@
                     <h2>Game Over!</h2>
                     <p>Score: <span id="final-score">0</span></p>
                     <button id="restart-btn" class="btn">Play Again</button>
+                </div>
+            </div>
+            
+            <div class="menu-overlay" id="menu-overlay" style="display: none;">
+                <div class="menu-content">
+                    <button id="close-menu-btn" class="close-menu-btn" aria-label="Close menu">×</button>
+                    <h2>Nokia Snake PWA</h2>
+                    
+                    <div class="menu-section">
+                        <h3>🎮 How to Play</h3>
+                        <p>Control the snake to eat food. Grow longer without hitting walls or yourself!</p>
+                    </div>
+                    
+                    <div class="menu-section">
+                        <h3>🕹️ Controls</h3>
+                        <p><strong>Desktop:</strong> Arrow Keys or WASD</p>
+                        <p><strong>Mobile:</strong> Use on-screen buttons</p>
+                    </div>
+                    
+                    <div class="menu-section">
+                        <h3>⚡ Speed Settings</h3>
+                        <div class="menu-speed-controls">
+                            <button class="speed-btn" data-speed="slow">Slow</button>
+                            <button class="speed-btn" data-speed="medium">Medium</button>
+                            <button class="speed-btn" data-speed="fast">Fast</button>
+                        </div>
+                        <p>Current: <span id="menu-current-speed">Medium</span></p>
+                    </div>
+                    
+                    <div class="menu-section">
+                        <h3>📱 PWA Features</h3>
+                        <p>Install this game as an app for offline play!</p>
+                        <button id="install-menu-btn" class="btn-secondary" style="display: none;">Install App</button>
+                    </div>
+                    
+                    <div class="menu-section">
+                        <h3>👨‍💻 About</h3>
+                        <p>Built by Naga</p>
+                        <p>Email: nagarjunajava10@gmail.com</p>
+                        <p>A classic Nokia-style Snake game PWA</p>
+                    </div>
+                    
+                    <div class="menu-section">
+                        <button id="close-menu" class="btn">Close Menu</button>
+                    </div>
                 </div>
             </div>
 
@@ -91,7 +140,7 @@
     <script src="ui.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('service-worker.js');
+            navigator.serviceWorker.register('./service-worker.js');
         }
         
         let deferredPrompt;
@@ -99,6 +148,7 @@
             e.preventDefault();
             deferredPrompt = e;
             document.getElementById('install-btn').style.display = 'block';
+            document.getElementById('install-menu-btn').style.display = 'block';
         });
         
         document.getElementById('install-btn').addEventListener('click', async () => {
@@ -107,6 +157,7 @@
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
                     document.getElementById('install-btn').style.display = 'none';
+                    document.getElementById('install-menu-btn').style.display = 'none';
                 }
                 deferredPrompt = null;
             }

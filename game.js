@@ -9,9 +9,9 @@ class Game {
         this.gameRunning = false;
         
         this.speedSettings = {
-            slow: { base: 200 },    // 5 moves per second
-            medium: { base: 150 },   // ~6.7 moves per second
-            fast: { base: 100 }      // 10 moves per second
+            slow: { base: 300 },    // ~3.3 moves per second
+            medium: { base: 200 },   // 5 moves per second
+            fast: { base: 150 }      // ~6.7 moves per second
         };
         
         this.currentSpeedSetting = 'medium';
@@ -217,6 +217,7 @@ class Game {
     
     pause() {
         this.gameRunning = false;
+        this.showPauseOverlay();
     }
     
     resume() {
@@ -224,6 +225,41 @@ class Game {
             this.gameRunning = true;
             this.lastRenderTime = performance.now();
             this.gameLoop();
+            this.hidePauseOverlay();
+        }
+    }
+    
+    showPauseOverlay() {
+        if (this.gameRunning || this.gameOver) return;
+        
+        const pauseOverlay = document.createElement('div');
+        pauseOverlay.id = 'auto-pause-overlay';
+        pauseOverlay.className = 'overlay';
+        pauseOverlay.innerHTML = `
+            <h2>Game Paused</h2>
+            <p>Game was interrupted</p>
+            <button id="resume-game-btn" class="btn">Resume Game</button>
+        `;
+        
+        const gameWrapper = document.querySelector('.game-wrapper');
+        if (gameWrapper && !document.getElementById('auto-pause-overlay')) {
+            gameWrapper.appendChild(pauseOverlay);
+            
+            document.getElementById('resume-game-btn').addEventListener('click', () => {
+                this.resume();
+            });
+            
+            document.getElementById('resume-game-btn').addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                this.resume();
+            });
+        }
+    }
+    
+    hidePauseOverlay() {
+        const pauseOverlay = document.getElementById('auto-pause-overlay');
+        if (pauseOverlay) {
+            pauseOverlay.remove();
         }
     }
     
